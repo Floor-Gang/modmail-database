@@ -9,11 +9,9 @@
     "postinstall": "tsc"
   },
   "dependencies": {
+    "@types/pg": "^7.14.7",
     "discord.js": "^12.5.1",
     "modmail-types": "Floor-Gang/modmail-types",
     "pg": "^8.5.1"
-  },
-  "devDependencies": {
-    "@types/pg": "^7.14.7"
   }
 }
