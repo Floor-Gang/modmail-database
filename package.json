@@ -1,0 +1,20 @@
+{
+  "name": "modmail-database",
+  "version": "1.0.0",
+  "main": "dist/index.js",
+  "types": "src/index.ts",
+  "repository": "https://github.com/Floor-Gang/modmail-database.git",
+  "author": "Floor Gang <https://github.com/Floor-Gang>",
+  "license": "GPL-3.0",
+  "scripts": {
+    "postinstall": "tsc"
+  },
+  "dependencies": {
+    "discord.js": "^12.5.1",
+    "modmail-types": "Floor-Gang/modmail-types",
+    "pg": "^8.5.1"
+  },
+  "devDependencies": {
+    "@types/pg": "^7.14.7"
+  }
+}
