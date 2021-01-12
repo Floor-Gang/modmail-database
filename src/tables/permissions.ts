@@ -1,6 +1,6 @@
 import { DBRole, Role } from 'modmail-types';
 import { PoolClient } from 'pg';
-import * as PermUtil from '../../util/Perms';
+import * as PermUtil from '../util/PermUtil';
 import Table from '../models/table';
 
 export default class PermManager extends Table {
