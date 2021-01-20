@@ -4,7 +4,7 @@ import { SnowflakeUtil } from 'discord.js';
 import Table from '../models/table';
 import { CreateStandardReplyOpt } from '../models/types';
 
-export default class StandardReplyManager extends Table {
+export default class StandardRepliesTable extends Table {
   constructor(pool: PoolClient) {
     super(pool, 'standard_replies');
   }
@@ -57,7 +57,7 @@ export default class StandardReplyManager extends Table {
     if (res.rowCount === 0) {
       return null;
     }
-    return StandardReplyManager.parse(res.rows[0]);
+    return StandardRepliesTable.parse(res.rows[0]);
   }
 
   /**

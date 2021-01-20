@@ -1,12 +1,12 @@
-import AttachmentManager from './tables/attachments';
-import CategoryManager from './tables/categories';
-import EditManager from './tables/edits';
-import MessageManager from './tables/messages';
-import MuteManager from './tables/mutes';
-import PermsManager from './tables/permissions';
-import StandardReplyManager from './tables/standardReplies';
-import ThreadManager from './tables/threads';
-import UsersManager from './tables/users';
+import AttachmentsTable from './tables/attachments';
+import CategoriesTable from './tables/categories';
+import EditsManager from './tables/edits';
+import MessagesTable from './tables/messages';
+import MutesTable from './tables/mutes';
+import PermissionsTable from './tables/permissions';
+import StandardRepliesTable from './tables/standardReplies';
+import ThreadsTable from './tables/threads';
+import UsersTable from './tables/users';
 import {
   Pool,
   PoolClient,
@@ -14,36 +14,36 @@ import {
 } from 'pg';
 
 export default class DatabaseManager {
-    public readonly edits: EditManager;
+    public readonly edits: EditsManager;
 
-    public readonly messages: MessageManager;
+    public readonly messages: MessagesTable;
 
-    public readonly mutes: MuteManager;
+    public readonly mutes: MutesTable;
 
-    public readonly threads: ThreadManager;
+    public readonly threads: ThreadsTable;
 
-    public readonly users: UsersManager;
+    public readonly users: UsersTable;
 
-    public readonly categories: CategoryManager;
+    public readonly categories: CategoriesTable;
 
-    public readonly attachments: AttachmentManager;
+    public readonly attachments: AttachmentsTable;
 
-    public readonly standardReplies: StandardReplyManager;
+    public readonly standardReplies: StandardRepliesTable;
 
-    public readonly permissions: PermsManager;
+    public readonly permissions: PermissionsTable;
 
     private readonly pool: PoolClient;
 
     constructor(pool: PoolClient) {
-      this.edits = new EditManager(pool);
-      this.messages = new MessageManager(pool);
-      this.mutes = new MuteManager(pool);
-      this.threads = new ThreadManager(pool);
-      this.users = new UsersManager(pool);
-      this.categories = new CategoryManager(pool);
-      this.attachments = new AttachmentManager(pool);
-      this.standardReplies = new StandardReplyManager(pool);
-      this.permissions = new PermsManager(pool);
+      this.edits = new EditsManager(pool);
+      this.messages = new MessagesTable(pool);
+      this.mutes = new MutesTable(pool);
+      this.threads = new ThreadsTable(pool);
+      this.users = new UsersTable(pool);
+      this.categories = new CategoriesTable(pool);
+      this.attachments = new AttachmentsTable(pool);
+      this.standardReplies = new StandardRepliesTable(pool);
+      this.permissions = new PermissionsTable(pool);
       this.pool = pool;
     }
 

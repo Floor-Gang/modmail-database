@@ -3,7 +3,7 @@ import { SnowflakeUtil } from 'discord.js';
 import { PoolClient } from 'pg';
 import Table from '../models/table';
 
-export default class ThreadManager extends Table {
+export default class ThreadsTable extends Table {
   constructor(pool: PoolClient) {
     super(pool, 'threads');
   }
@@ -85,7 +85,7 @@ export default class ThreadManager extends Table {
       return null;
     }
 
-    return ThreadManager.parse(res.rows[0]);
+    return ThreadsTable.parse(res.rows[0]);
   }
 
   /**
@@ -104,7 +104,7 @@ export default class ThreadManager extends Table {
       return null;
     }
 
-    return ThreadManager.parse(res.rows[0]);
+    return ThreadsTable.parse(res.rows[0]);
   }
 
   /**

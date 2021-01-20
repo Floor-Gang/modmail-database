@@ -2,7 +2,7 @@ import { PoolClient } from 'pg';
 import { Edit } from 'modmail-types';
 import Table from '../models/table';
 
-export default class EditManager extends Table {
+export default class EditsTable extends Table {
   constructor(pool: PoolClient) {
     super(pool, 'edits');
   }

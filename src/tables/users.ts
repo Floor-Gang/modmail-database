@@ -1,7 +1,7 @@
 import { PoolClient } from 'pg';
 import Table from '../models/table';
 
-export default class UsersManager extends Table {
+export default class UsersTable extends Table {
   constructor(pool: PoolClient) {
     super(pool, 'users');
   }

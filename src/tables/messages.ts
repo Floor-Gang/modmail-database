@@ -2,7 +2,7 @@ import { DBMessage, Message } from 'modmail-types';
 import { PoolClient } from 'pg';
 import Table from '../models/table';
 
-export default class MessageManager extends Table {
+export default class MessagesTable extends Table {
   constructor(pool: PoolClient) {
     super(pool, 'messages');
   }
@@ -101,7 +101,7 @@ export default class MessageManager extends Table {
       return null;
     }
 
-    return MessageManager.parse(res.rows[0]);
+    return MessagesTable.parse(res.rows[0]);
   }
 
   public async getPastMessages(threadID: string): Promise<Message[]> {
@@ -109,7 +109,7 @@ export default class MessageManager extends Table {
       `SELECT * FROM ${this.name} WHERE thread_id = $1 AND is_deleted = false`,
       [threadID],
     );
-    return res.rows.map((row: DBMessage) => MessageManager.parse(row));
+    return res.rows.map((row: DBMessage) => MessagesTable.parse(row));
   }
 
   /**

@@ -3,7 +3,7 @@ import { PoolClient } from 'pg';
 import * as PermUtil from '../util/PermUtil';
 import Table from '../models/table';
 
-export default class PermManager extends Table {
+export default class PermissionsTable extends Table {
   constructor(pool: PoolClient) {
     super(pool, 'permissions');
   }
@@ -48,7 +48,7 @@ export default class PermManager extends Table {
       return null;
     }
 
-    return PermManager.parse(res.rows[0]);
+    return PermissionsTable.parse(res.rows[0]);
   }
 
   public async fetchAll(category: string): Promise<Role[]> {
@@ -57,7 +57,7 @@ export default class PermManager extends Table {
       [category],
     );
 
-    return res.rows.map(PermManager.parse);
+    return res.rows.map(PermissionsTable.parse);
   }
 
   /**

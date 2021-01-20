@@ -10,7 +10,7 @@ import {
   CreateCategoryOpt,
 } from '../models/types';
 
-export default class CategoryManager extends Table {
+export default class CategoriesTable extends Table {
   constructor(pool: PoolClient) {
     super(pool, 'categories');
   }
@@ -105,7 +105,7 @@ export default class CategoryManager extends Table {
    * @throws {Error} If nothing is resolved
    */
   public async fetchAll(by: CategoryResolvable, id: string): Promise<Category[]> {
-    const target = CategoryManager.resolve(by);
+    const target = CategoriesTable.resolve(by);
     let parsed: null | boolean = null;
 
     if (by === CategoryResolvable.activity) {
@@ -121,7 +121,7 @@ export default class CategoryManager extends Table {
       return [];
     }
 
-    return res.rows.map(CategoryManager.parse);
+    return res.rows.map(CategoriesTable.parse);
   }
 
   /**

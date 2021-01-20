@@ -4,7 +4,7 @@ import { PoolClient } from 'pg';
 import Table from '../models/table';
 import { CreateAttachmentOpt } from '../models/types';
 
-export default class Attachments extends Table {
+export default class AttachmentsTable extends Table {
   constructor(pool: PoolClient) {
     super(pool, 'attachments');
   }

@@ -2,7 +2,7 @@ import { DBMuteStatus, MuteStatus } from 'modmail-types';
 import { PoolClient } from 'pg';
 import Table from '../models/table';
 
-export default class MuteManager extends Table {
+export default class MutesTable extends Table {
   constructor(pool: PoolClient) {
     super(pool, 'mutes');
   }
@@ -58,7 +58,7 @@ export default class MuteManager extends Table {
       [user],
     );
 
-    return res.rows.map(MuteManager.parse);
+    return res.rows.map(MutesTable.parse);
   }
 
   /**
