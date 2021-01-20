@@ -1,5 +1,3 @@
-import DatabaseManager from './database';
-
 export * from './database';
 export * from './tables/attachments';
 export * from './tables/categories';
