@@ -90,3 +90,14 @@ export default class DatabaseManager {
       );
     }
 }
+
+
+export * from './tables/attachments';
+export * from './tables/categories';
+export * from './tables/edits';
+export * from './tables/messages';
+export * from './tables/mutes';
+export * from './tables/permissions';
+export * from './tables/standardReplies';
+export * from './tables/threads';
+export * from './tables/users';
