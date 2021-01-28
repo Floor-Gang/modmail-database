@@ -104,6 +104,15 @@ export default class MessagesTable extends Table {
     return MessagesTable.parse(res.rows[0]);
   }
 
+  public async fetchAll(threadID: string): Promise<Message[]> {
+    const res = await this.pool.query(
+      `SELECT * FROM ${this.name} WHERE thread_id = $1`,
+      [threadID],
+    );
+
+    return res.rows.map((data) => MessagesTable.parse(data));
+  }
+
   public async getPastMessages(threadID: string): Promise<Message[]> {
     const res = await this.pool.query(
       `SELECT * FROM ${this.name} WHERE thread_id = $1 AND is_deleted = false`,
