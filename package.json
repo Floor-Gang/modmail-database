@@ -12,7 +12,7 @@
   "dependencies": {
     "@types/pg": "^7.14.7",
     "discord.js": "^12.5.1",
-    "modmail-types": "github:Floor-Gang/modmail-types#d58555cf1efc22d12d70e13cef4da50855b36b24",
+    "modmail-types": "github:Floor-Gang/modmail-types",
     "pg": "^8.5.1"
   }
 }
