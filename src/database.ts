@@ -81,12 +81,14 @@ export default class DatabaseManager {
         `CREATE SCHEMA IF NOT EXISTS modmail`,
       );
 
-      await this.pool.query(
-        `CREATE TYPE modmail.file_type AS ENUM ('image', 'file');`,
-      );
+      try {
+        await this.pool.query(
+          `CREATE TYPE modmail.file_type AS ENUM ('image', 'file');`,
+        );
 
-      await this.pool.query(
-        `CREATE TYPE modmail.role_level AS ENUM ('admin', 'mod');`,
-      );
+        await this.pool.query(
+          `CREATE TYPE modmail.role_level AS ENUM ('admin', 'mod');`,
+        );
+      } catch (_) { /* ignore these errors */ }
     }
 }
