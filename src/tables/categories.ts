@@ -201,7 +201,7 @@ export default class CategoriesTable extends Table {
       emojiID: data.emote,
       guildID: data.guild_id.toString(),
       id: data.id.toString(),
-      isActive: true,
+      isActive: data.is_active,
       name: data.name,
     };
   }
