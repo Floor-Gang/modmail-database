@@ -108,6 +108,38 @@ export default class ThreadsTable extends Table {
   }
 
   /**
+   * Get all threads by category ID
+   * @param {string} catID Category ID
+   * @returns {Promise<Thread[]>}
+   */
+  public async getByCategory(catID: string): Promise<Thread[]> {
+    const res = await this.pool.query(
+      `SELECT * FROM ${this.name} WHERE category = $1`,
+      [catID],
+    );
+
+    return res.rows.map((data) => ThreadsTable.parse(data));
+  }
+
+  /**
+   * Get a single thread by ID
+   * @param {string} threadID
+   * @returns {Promise<Thread | null>}
+   */
+  public async getByID(threadID: string): Promise<Thread | null> {
+    const res = await this.pool.query(
+      `SELECT * FROM ${this.name} WHERE id = $1`,
+      [threadID],
+    );
+
+    if (res.rowCount === 0) {
+      return null;
+    }
+
+    return ThreadsTable.parse(res.rows[0]);
+  }
+
+  /**
    * Initialize threads table
    */
   protected async init(): Promise<void> {
