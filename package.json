@@ -6,7 +6,9 @@
   "repository": "https://github.com/Floor-Gang/modmail-database.git",
   "author": "Floor Gang <https://github.com/Floor-Gang>",
   "license": "GPL-3.0",
-  "scripts": {},
+  "scripts": {
+    "postinstall": "tsc"
+  },
   "dependencies": {
     "@types/pg": "^7.14.7",
     "discord.js": "^12.5.1",
