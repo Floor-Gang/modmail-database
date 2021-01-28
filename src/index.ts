@@ -8,6 +8,12 @@ import PermissionsTable from './tables/permissions';
 import StandardRepliesTable from './tables/standardReplies';
 import ThreadsTable from './tables/threads';
 import UsersTable from './tables/users';
+import {
+  CreateCategoryOpt,
+  CreateAttachmentOpt,
+  CreateStandardReplyOpt,
+  CategoryResolvable,
+} from './models/types';
 
 export {
   AttachmentsTable,
@@ -20,5 +26,9 @@ export {
   StandardRepliesTable,
   ThreadsTable,
   UsersTable,
+  CreateCategoryOpt,
+  CreateAttachmentOpt,
+  CreateStandardReplyOpt,
+  CategoryResolvable,
 };
 
