@@ -1,7 +1,7 @@
 {
   "name": "modmail-database",
   "version": "1.0.0",
-  "main": "dist/index.js",
+  "main": "build/index.js",
   "types": "src/index.ts",
   "repository": "https://github.com/Floor-Gang/modmail-database.git",
   "author": "Floor Gang <https://github.com/Floor-Gang>",
