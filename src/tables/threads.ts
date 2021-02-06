@@ -114,7 +114,7 @@ export default class ThreadsTable extends Table {
    */
   public async getByCategory(catID: string): Promise<Thread[]> {
     const res = await this.pool.query(
-      `SELECT * FROM ${this.name} WHERE category = $1`,
+      `SELECT * FROM ${this.name} WHERE category = $1 ORDER BY id DESC`,
       [catID],
     );
 
