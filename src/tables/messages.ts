@@ -106,7 +106,7 @@ export default class MessagesTable extends Table {
 
   public async fetchAll(threadID: string): Promise<Message[]> {
     const res = await this.pool.query(
-      `SELECT * FROM ${this.name} WHERE thread_id = $1`,
+      `SELECT * FROM ${this.name} WHERE thread_id = $1 ORDER BY modmail_id DESC`,
       [threadID],
     );
 
