@@ -113,6 +113,21 @@ export default class MessagesTable extends Table {
     return res.rows.map((data) => MessagesTable.parse(data));
   }
 
+  public async fetchLast(threadID: String): Promise<Message | null> {
+    const res = await this.pool.query(
+      `SELECT * FROM ${this.name} WHERE thread_id = $1`
+      + ' ORDER BY modmail_id DESC'
+      + ' LIMIT 1',
+      [threadID],
+    );
+
+    if (res.rowCount === 0) {
+      return null;
+    }
+
+    return MessagesTable.parse(res.rows[0]);
+  }
+
   public async getPastMessages(threadID: string): Promise<Message[]> {
     const res = await this.pool.query(
       `SELECT * FROM ${this.name} WHERE thread_id = $1 AND is_deleted = false`,
