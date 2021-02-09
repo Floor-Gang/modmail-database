@@ -1,7 +1,5 @@
-import {
-  Category,
-  DBCategory,
-} from 'modmail-types';
+import { Category } from '@Floor-Gang/modmail-types';
+import { DBCategory } from '../models/types';
 import { PoolClient } from 'pg';
 import { SnowflakeUtil } from 'discord.js';
 import Table from '../models/table';

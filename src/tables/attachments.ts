@@ -1,4 +1,4 @@
-import { FileType } from 'modmail-types';
+import { FileType } from '@Floor-Gang/modmail-types';
 import { SnowflakeUtil } from 'discord.js';
 import { PoolClient } from 'pg';
 import Table from '../models/table';

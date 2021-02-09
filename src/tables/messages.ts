@@ -1,4 +1,5 @@
-import { DBMessage, Message } from 'modmail-types';
+import { Message } from '@Floor-Gang/modmail-types';
+import { DBMessage } from '../models/types';
 import { PoolClient } from 'pg';
 import Table from '../models/table';
 

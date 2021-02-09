@@ -1,0 +1,5 @@
+src/
+.gitignore
+.npmrc
+README.md
+tsconfig.json

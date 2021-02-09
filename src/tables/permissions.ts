@@ -1,4 +1,5 @@
-import { DBRole, Role } from 'modmail-types';
+import { Role } from '@Floor-Gang/modmail-types';
+import { DBRole } from '../models/types';
 import { PoolClient } from 'pg';
 import * as PermUtil from '../util/PermUtil';
 import Table from '../models/table';

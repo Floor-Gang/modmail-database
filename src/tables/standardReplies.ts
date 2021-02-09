@@ -1,4 +1,5 @@
-import { DBStandardReply, StandardReply } from 'modmail-types';
+import { StandardReply } from '@Floor-Gang/modmail-types';
+import { DBStandardReply } from '../models/types';
 import { PoolClient } from 'pg';
 import { SnowflakeUtil } from 'discord.js';
 import Table from '../models/table';

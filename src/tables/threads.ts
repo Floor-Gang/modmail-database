@@ -1,4 +1,5 @@
-import { DBThread, Thread } from 'modmail-types';
+import { Thread } from '@Floor-Gang/modmail-types';
+import { DBThread } from '../models/types';
 import { SnowflakeUtil } from 'discord.js';
 import { PoolClient } from 'pg';
 import Table from '../models/table';

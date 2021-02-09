@@ -1,4 +1,4 @@
-import { RoleLevel } from 'modmail-types';
+import { RoleLevel } from '@Floor-Gang/modmail-types';
 
 /**
  * Converts a human readable string to a RoleLevel enum
