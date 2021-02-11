@@ -33,19 +33,16 @@ export default class MutesTable extends Table {
    * Unmute a user
    * @param {string} user
    * @param {string} category
-   * @returns {Promise<void>}
-   * @throws {Error} if nothing happened
+   * @returns {Promise<boolean>}
    */
-  public async delete(user: string, cat: string): Promise<void> {
+  public async delete(user: string, category: string): Promise<boolean> {
     const res = await this.pool.query(
       `DELETE FROM ${this.name}`
       + ' WHERE user_id=$1 AND category_id=$2 AND till > $3',
-      [user, cat, Date.now()],
+      [user, category, Date.now()],
     );
 
-    if (res.rowCount === 0) {
-      throw new Error(`${user} wasn't muted`);
-    }
+    return res.rowCount !== 0;
   }
 
   /**
@@ -100,18 +97,15 @@ export default class MutesTable extends Table {
    * Unmute a user from a category
    * @param {string} user
    * @param {string} category
-   * @returns {Promise<void>}
-   * @throws {Error} If they weren't unmuted
+   * @returns {Promise<boolean>}
    */
-  public async remove(user: string, category: string): Promise<void> {
+  public async remove(user: string, category: string): Promise<boolean> {
     const res = await this.pool.query(
       `DELETE FROM ${this.name} WHERE user_id=$1 AND category_id=$2`,
       [user, category],
     );
 
-    if (res.rowCount === 0) {
-      throw new Error('Failed to remove user from mutes table.');
-    }
+    return res.rowCount !== 0;
   }
 
   /**

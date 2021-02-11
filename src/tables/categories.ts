@@ -18,7 +18,6 @@ export default class CategoriesTable extends Table {
    * @method create
    * @param {CreateCategoryOpt} opt Required options for a new category
    * @returns {Promise<Category>}
-   * @throws {Error} A Postgres-related error, mostly from constraint issues.
    */
   public async create(opt: CreateCategoryOpt): Promise<Category> {
     const categoryID = SnowflakeUtil.generate(Date.now());
@@ -43,56 +42,47 @@ export default class CategoriesTable extends Table {
 
   /**
    * Set the activity of a category based on a provided emote.
-   * @param {string} emoji
+   * @param {string} id
    * @param {boolean} active
-   * @returns {Promise<void>}
-   * @throws {Error} if nothing was updated
+   * @returns {Promise<boolean>}
    */
-  public async setActive(id: string, active: boolean): Promise<void> {
+  public async setActive(id: string, active: boolean): Promise<boolean> {
     const res = await this.pool.query(
       `UPDATE ${this.name} SET is_active=$2 WHERE id=$1`,
       [id, active],
     );
 
-    if (res.rowCount === 0) {
-      throw new Error('Nothing was updated');
-    }
+    return res.rowCount !== 0;
   }
 
   /**
    * Set a unique emote for a given category.
    * @param {string} id Category identifier
    * @param {string} emote New unique emote
-   * @returns {Promise<void>}
-   * @throws {Error} If nothing was updated
+   * @returns {Promise<boolean>} Whether or not something changed
    */
-  public async setEmote(id: string, emote: string): Promise<void> {
+  public async setEmote(id: string, emote: string): Promise<boolean> {
     const res = await this.pool.query(
       `UPDATE ${this.name} SET emote = $1 WHERE id = $2`,
       [emote, id],
     );
 
-    if (res.rowCount === 0) {
-      throw new Error('Nothing was updated');
-    }
+    return res.rowCount !== 0;
   }
 
   /**
    * Set a unique name for a given category.
-   * @param {string} id Targetted category
+   * @param {string} id Targeted category
    * @param {string} name A new unique name
-   * @returns {Promise<void>}
-   * @throws {Error} If nothing was updated
+   * @returns {Promise<boolean>}
    */
-  public async setName(id: string, name: string): Promise<void> {
+  public async setName(id: string, name: string): Promise<boolean> {
     const res = await this.pool.query(
       `UPDATE ${this.name} SET name = $1 WHERE id = $2`,
       [name, id],
     );
 
-    if (res.rowCount === 0) {
-      throw new Error('Nothing was updated');
-    }
+    return res.rowCount !== 0;
   }
 
   /**
@@ -100,7 +90,6 @@ export default class CategoriesTable extends Table {
    * @param {CategoryResolvable} by
    * @param {string} id
    * @returns {Promise<Category[]>}
-   * @throws {Error} If nothing is resolved
    */
   public async fetchAll(by: CategoryResolvable, id: string): Promise<Category[]> {
     const target = CategoriesTable.resolve(by);
@@ -126,7 +115,7 @@ export default class CategoriesTable extends Table {
    * @method fetch
    * @param {CategoryResolvable} by
    * @param {string} id
-   * @throws {Error} If nothing is resolved
+   * @returns {Promise<Category | null>}
    */
   public async fetch(by: CategoryResolvable, id: string): Promise<Category | null> {
     const res = await this.fetchAll(by, id);
@@ -190,7 +179,7 @@ export default class CategoriesTable extends Table {
 
   /**
    * @method parse
-   * @param {DBCatergory} data
+   * @param {DBCategory} data
    * @returns {Category}
    */
   private static parse(data: DBCategory): Category {

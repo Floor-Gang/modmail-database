@@ -33,12 +33,11 @@ export default class MessagesTable extends Table {
 
   /**
    * Get the last message of a thread
-   * @param {string} threadID
+   * @param {string} id
    * @param {string} author
-   * @returns {Promise<Message>}
-   * @throws {Error} If nothing was resolved
+   * @returns {Promise<Message | null>}
    */
-  public async getLastMessage(id: string, author: string): Promise<Message> {
+  public async getLastMessage(id: string, author: string): Promise<Message | null> {
     const res = await this.pool.query(
       `SELECT * FROM ${this.name}`
       + ' WHERE sender = $1'
@@ -50,30 +49,18 @@ export default class MessagesTable extends Table {
     );
 
     if (res.rowCount === 0) {
-      throw new Error(`${id} didn't resolve anything.`);
+      return null;
     }
 
-    const row = res.rows[0];
-    return {
-      clientID: row.client_id,
-      content: row.content,
-      edits: [],
-      files: [],
-      isDeleted: row.is_deleted,
-      modmailID: row.modmail_id,
-      sender: row.sender,
-      internal: row.internal,
-      threadID: row.thread_id,
-    };
+    return MessagesTable.parse(res.rows[0]);
   }
 
   /**
    * Set a message to deleted
    * @param {string} id
-   * @returns {Promise<void>}
-   * @throws {Error} If nothing is updated
+   * @returns {Promise<boolean>}
    */
-  public async setDeleted(id: string): Promise<void> {
+  public async setDeleted(id: string): Promise<boolean> {
     const res = await this.pool.query(
       `UPDATE ${this.name} SET`
       + ' is_deleted = true'
@@ -82,9 +69,7 @@ export default class MessagesTable extends Table {
       [id],
     );
 
-    if (res.rowCount === 0) {
-      throw new Error('Nothing was updated');
-    }
+    return res.rowCount !== 0;
   }
 
   /**

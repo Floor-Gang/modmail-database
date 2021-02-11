@@ -13,22 +13,18 @@ export default class ThreadsTable extends Table {
    * Mark a thread a closed
    * @method close
    * @param {string} id
-   * @returns {Promise<void>}
-   * @throws {Error} If nothign is updated
+   * @returns {Promise<boolean>}
    */
-  public async close(id: string): Promise<void> {
+  public async close(id: string): Promise<boolean> {
     const res = await this.pool.query(
       `UPDATE ${this.name} SET is_active = false WHERE channel = $1`,
       [id],
     );
 
-    if (res.rowCount === 0) {
-      throw new Error('Nothing was updated');
-    }
+    return res.rowCount !== 0;
   }
 
   /**
-   * @method open
    * @param {string} author
    * @param {string} channelID
    * @param {string} categoryID
@@ -60,7 +56,6 @@ export default class ThreadsTable extends Table {
 
   /**
    * Count the number of active threads for a user
-   * @method countThreads
    * @param {string} user
    * @returns {Promise<number>}
    */
@@ -90,12 +85,10 @@ export default class ThreadsTable extends Table {
   }
 
   /**
-   * @method getThreadByChannel
    * @param {string} channelID
-   * @returns {Promise<Thread>}
-   * @throws {Error} if nothing was resolved
+   * @returns {Promise<Thread | null>}
    */
-  public async getThreadByChannel(channelID: string): Promise<Thread | null> {
+  public async getByChannel(channelID: string): Promise<Thread | null> {
     const res = await this.pool.query(
       `SELECT * FROM ${this.name} WHERE channel = $1 AND is_active = true LIMIT 1`,
       [channelID],
