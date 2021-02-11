@@ -76,6 +76,19 @@ export default class ThreadsTable extends Table {
     return res.rows[0].count;
   }
 
+  public async getByUser(userID: string): Promise<Thread | null> {
+    const res = await this.pool.query(
+      `SELECT * FROM ${this.name} WHERE author = $1 AND is_active = true LIMIT 1`,
+      [userID],
+    );
+
+    if (res.rowCount === 0) {
+      return null;
+    }
+
+    return ThreadsTable.parse(res.rows[0]);
+  }
+
   /**
    * @param {string} user
    * @returns {Promise<Thread | null>} if thread was found
