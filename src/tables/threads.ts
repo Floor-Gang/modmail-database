@@ -55,14 +55,22 @@ export default class ThreadsTable extends Table {
   }
 
   /**
-   * Count the number of active threads for a user
+   * Count the number of past threads for a user
    * @param {string} user
    * @returns {Promise<number>}
    */
-  public async countThreads(user: string): Promise<number> {
+  public async countUser(user: string): Promise<number> {
     const res = await this.pool.query(
       `SELECT COUNT(*) FROM ${this.name} WHERE author = $1 AND is_active = false`,
       [user],
+    );
+
+    return res.rows[0].count;
+  }
+
+  public async countCategory(category: string): Promise<number> {
+    const res = await this.pool.query(
+      `SELECT COUNT(*) FROM ${this.name} WHERE category = $1 AND is_active = true`,
     );
 
     return res.rows[0].count;
