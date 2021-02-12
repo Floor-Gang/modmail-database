@@ -180,6 +180,17 @@ export default class ThreadsTable extends Table {
     return ThreadsTable.parse(res.rows[0]);
   }
 
+  public async updateThread(
+    threadID: string,
+    channelID: string,
+    categoryID: string,
+  ): Promise<void> {
+    await this.pool.query(
+      'UPDATE modmail.threads SET channel = $1, category = $2 WHERE id = $3;',
+      [channelID, categoryID, threadID],
+    );
+  }
+
   /**
    * Initialize threads table
    */
@@ -213,25 +224,23 @@ export default class ThreadsTable extends Table {
     );
   }
 
+  protected async migrate(): Promise<void> {
+    // Add is_admin_only column
+    await this.pool.query(
+      `ALTER TABLE modmail.threads
+          ADD COLUMN IF NOT EXISTS is_admin_only boolean DEFAULT false NOT NULL`,
+    );
+  }
+
   private static parse(data: DBThread): Thread {
     return {
       author: { id: data.author },
       channel: data.channel.toString(),
       id: data.id.toString(),
+      isAdminOnly: data.is_admin_only,
       isActive: data.is_active,
       messages: [],
       category: data.category.toString(),
     };
-  }
-
-  public async updateThread(
-    threadID: string,
-    channelID: string,
-    categoryID: string,
-  ): Promise<void> {
-    await this.pool.query(
-      'UPDATE modmail.threads SET channel = $1, category = $2 WHERE id = $3;',
-      [channelID, categoryID, threadID],
-    );
   }
 }

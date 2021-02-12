@@ -83,6 +83,7 @@ export type DBThread = {
     author: string,
     channel: number,
     id: number,
+    is_admin_only: boolean,
     is_active: boolean,
     category: number,
 }
