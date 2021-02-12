@@ -57,6 +57,7 @@ export default class CategoriesTable extends Table {
       `UPDATE modmail.categories
        SET channel_id = null
        WHERE id = $1`,
+      [id],
     );
 
     return res.rowCount !== 0;
