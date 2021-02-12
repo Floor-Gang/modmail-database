@@ -61,7 +61,7 @@ export enum CategoryResolvable {
 
 export type DBCategory = {
     is_active: boolean,
-    channel_id: number,
+    channel_id: number | null,
     emote: string,
     description: string,
     guild_id: number,
