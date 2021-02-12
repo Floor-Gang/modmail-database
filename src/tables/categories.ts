@@ -168,6 +168,21 @@ export default class CategoriesTable extends Table {
     return CategoriesTable.parse(res.rows[0]);
   }
 
+  public async fetchByGuild(guildID: string): Promise<Category | null> {
+    const res = await this.pool.query(
+      `SELECT *
+       FROM modmail.categories
+       WHERE guild_id = $1`,
+      [guildID],
+    );
+
+    if (res.rowCount === 0) {
+      return null;
+    }
+
+    return CategoriesTable.parse(res.rows[0]);
+  }
+
   public async fetchByName(name: string): Promise<Category | null> {
     const res = await this.pool.query(
       `SELECT *
