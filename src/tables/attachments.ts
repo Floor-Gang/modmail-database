@@ -1,8 +1,8 @@
-import { FileType } from '@Floor-Gang/modmail-types';
+import { Attachment, FileType } from '@Floor-Gang/modmail-types';
 import { SnowflakeUtil } from 'discord.js';
 import { PoolClient } from 'pg';
 import Table from '../models/table';
-import { CreateAttachmentOpt } from '../models/types';
+import { CreateAttachmentOpt, DBAttachment } from '../models/types';
 
 export default class AttachmentsTable extends Table {
   constructor(pool: PoolClient) {
@@ -22,13 +22,31 @@ export default class AttachmentsTable extends Table {
     );
   }
 
+  public async fetch(msgID: string): Promise<Attachment[]> {
+    const res = await this.pool.query(
+      `SELECT * FROM modmail.attachments WHERE message_id = $1`,
+      [msgID],
+    );
+
+    return res.rows.map((a: DBAttachment) => AttachmentsTable.parse(a));
+  }
+
+  private static parse(data: DBAttachment): Attachment {
+    return {
+      id: data.id.toString(),
+      name: data.name,
+      sender: data.sender.toString(),
+      source: data.source,
+      type: data.type === 'image' ? FileType.Image : FileType.File,
+    }
+  }
+
   /**
    * Initialize attachments table
    */
   protected async init(): Promise<void> {
     await this.pool.query(
-`CREATE TABLE IF NOT EXISTS modmail.attachments
-(
+`CREATE TABLE IF NOT EXISTS modmail.attachments (
     id         BIGINT                                                NOT NULL
     CONSTRAINT attachments_pk PRIMARY KEY,
     message_id BIGINT                                                NOT NULL
@@ -39,8 +57,8 @@ export default class AttachmentsTable extends Table {
     sender     BIGINT                                                NOT NULL
     CONSTRAINT attachments_users_id_fk
     REFERENCES modmail.users,
-    TYPE       modmail.file_type DEFAULT 'file' :: modmail.file_type NOT NULL
-);`,
+    type       modmail.file_type DEFAULT 'file' :: modmail.file_type NOT NULL
+    );`,
       );
 
     await this.pool.query(

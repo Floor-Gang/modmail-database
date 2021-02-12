@@ -27,6 +27,18 @@ export default class EditsTable extends Table {
     return version.rows[0].version;
   }
 
+  public async fetch(msgID: string): Promise<Edit[]> {
+    const res = await this.pool.query(
+      `SELECT *
+       FROM modmail.edits
+       WHERE message = $1
+       ORDER BY version`,
+      [msgID],
+    );
+
+    return res.rows;
+  }
+
   /**
    * Initialize the edits table
    */

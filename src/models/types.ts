@@ -46,6 +46,15 @@ export type CreateStandardReplyOpt = {
     reply: string
 }
 
+export type DBAttachment = {
+    id: number,
+    message_id: number,
+    name: string,
+    source: string,
+    sender: number,
+    type: string,
+}
+
 export type DBCategory = {
     is_active: boolean,
     channel_id: number | null,
