@@ -161,24 +161,12 @@ export default class CategoriesTable extends Table {
            id          BIGINT               NOT NULL
                CONSTRAINT categories_pk PRIMARY KEY,
            channel_id  BIGINT UNIQUE,
-           name        TEXT                 NOT NULL,
+           name        TEXT UNIQUE          NOT NULL,
            is_active   BOOLEAN DEFAULT true NOT NULL,
-           guild_id    BIGINT               NOT NULL,
-           emote       TEXT                 NOT NULL,
+           guild_id    BIGINT UNIQUE        NOT NULL,
+           emote       TEXT UNIQUE          NOT NULL,
            description TEXT    DEFAULT ''   NOT NULL
        );`,
-    );
-
-    await this.pool.query(
-      `CREATE UNIQUE INDEX IF NOT EXISTS categories_emote_uindex ON modmail.categories (emote);`,
-    );
-
-    await this.pool.query(
-      `CREATE UNIQUE INDEX IF NOT EXISTS categories_id_uindex ON modmail.categories (id);`,
-    );
-
-    await this.pool.query(
-      `CREATE UNIQUE INDEX IF NOT EXISTS categories_name_uindex ON modmail.categories (name);`,
     );
   }
 
@@ -223,6 +211,12 @@ export default class CategoriesTable extends Table {
       `UPDATE modmail.categories
        SET channel_id = null
        WHERE is_active = false;`,
+    );
+
+    // make only guild per category
+    await this.pool.query(
+      `CREATE UNIQUE INDEX IF NOT EXISTS categories_guild_id_uindex
+          ON modmail.categories (guild_id);`,
     );
   }
 
