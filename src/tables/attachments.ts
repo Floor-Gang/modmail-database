@@ -33,6 +33,7 @@ export default class AttachmentsTable extends Table {
 
   private static parse(data: DBAttachment): Attachment {
     return {
+      messageID: data.message_id.toString(),
       id: data.id.toString(),
       name: data.name,
       sender: data.sender.toString(),

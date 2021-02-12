@@ -1,6 +1,6 @@
 {
   "name": "@Floor-Gang/modmail-database",
-  "version": "1.15.0",
+  "version": "1.16.0",
   "main": "build/index.js",
   "types": "build/index.d.ts",
   "repository": "git://github.com/Floor-Gang/modmail-database.git",
@@ -10,7 +10,7 @@
     "prepublish": "tsc"
   },
   "dependencies": {
-    "@Floor-Gang/modmail-types": "^1.7.0",
+    "@Floor-Gang/modmail-types": "^1.8.0",
     "@types/pg": "^7.14.7",
     "discord.js": "^12.5.1",
     "pg": "^8.5.1"
