@@ -54,10 +54,10 @@ export default class StandardRepliesTable extends Table {
 
   /**
    * Get a standard reply
-   * @param name
+   * @param {string} name
    * @return {StandardReply | null}
    */
-  public async get(name: string): Promise<StandardReply | null> {
+  public async fetch(name: string): Promise<StandardReply | null> {
     const res = await this.pool.query(
       `SELECT *
        FROM modmail.standard_replies
@@ -68,6 +68,14 @@ export default class StandardRepliesTable extends Table {
       return null;
     }
     return StandardRepliesTable.parse(res.rows[0]);
+  }
+
+  public async fetchAll(): Promise<StandardReply[]> {
+    const res = await this.pool.query(
+      `SELECT * FROM modmail.standard_replies;`,
+    );
+
+    return res.rows.map((sr) => StandardRepliesTable.parse(sr));
   }
 
   /**
