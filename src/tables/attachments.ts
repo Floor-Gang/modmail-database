@@ -9,10 +9,7 @@ export default class AttachmentsTable extends Table {
     super(pool, 'attachments');
   }
 
-  /**
-  * @param {CreateAttachmentOpt} opt
-  */
-  public async create(opt: CreateAttachmentOpt): Promise<void> {
+  public async create(opt: CreateAttachmentOpt): Promise<Attachment> {
     const id = SnowflakeUtil.generate(Date.now());
     const type = opt.type === FileType.Image ? 'image' : 'file';
     await this.pool.query(
@@ -20,11 +17,18 @@ export default class AttachmentsTable extends Table {
        VALUES ($1, $2, $3, $4, $5, $6);`,
       [id, opt.messageID, opt.name, opt.source, opt.sender, type],
     );
+
+    return {
+      ...opt,
+      id,
+    };
   }
 
   public async fetch(msgID: string): Promise<Attachment[]> {
     const res = await this.pool.query(
-      `SELECT * FROM modmail.attachments WHERE message_id = $1`,
+      `SELECT *
+       FROM modmail.attachments
+       WHERE message_id = $1`,
       [msgID],
     );
 
@@ -39,7 +43,7 @@ export default class AttachmentsTable extends Table {
       sender: data.sender.toString(),
       source: data.source,
       type: data.type === 'image' ? FileType.Image : FileType.File,
-    }
+    };
   }
 
   /**
@@ -47,23 +51,41 @@ export default class AttachmentsTable extends Table {
    */
   protected async init(): Promise<void> {
     await this.pool.query(
-`CREATE TABLE IF NOT EXISTS modmail.attachments (
-    id         BIGINT                                                NOT NULL
-    CONSTRAINT attachments_pk PRIMARY KEY,
-    message_id BIGINT                                                NOT NULL
-    CONSTRAINT attachments_messages_modmail_id_fk
-    REFERENCES modmail.messages (modmail_id),
-    name       TEXT                                                  NOT NULL,
-    source     TEXT                                                  NOT NULL,
-    sender     BIGINT                                                NOT NULL
-    CONSTRAINT attachments_users_id_fk
-    REFERENCES modmail.users,
-    type       modmail.file_type DEFAULT 'file' :: modmail.file_type NOT NULL
-    );`,
-      );
+      `CREATE TABLE IF NOT EXISTS modmail.attachments
+       (
+           id
+           BIGINT
+           NOT
+           NULL
+           CONSTRAINT
+           attachments_pk
+           PRIMARY
+           KEY,
+           message_id
+           BIGINT
+           NOT
+           NULL
+           CONSTRAINT
+           attachments_messages_modmail_id_fk
+           REFERENCES
+           modmail
+           .
+           messages
+       (
+           modmail_id
+       ),
+          name TEXT NOT NULL,
+          source TEXT NOT NULL,
+          sender BIGINT NOT NULL
+          CONSTRAINT attachments_users_id_fk
+          REFERENCES modmail.users,
+          type modmail.file_type DEFAULT 'file' :: modmail.file_type NOT NULL
+          );`,
+    );
 
     await this.pool.query(
-      `CREATE UNIQUE INDEX IF NOT EXISTS attachments_id_uindex ON modmail.attachments (id);`,
+      `CREATE
+      UNIQUE INDEX IF NOT EXISTS attachments_id_uindex ON modmail.attachments (id);`,
     );
   }
 }
