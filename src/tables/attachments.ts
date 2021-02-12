@@ -53,34 +53,19 @@ export default class AttachmentsTable extends Table {
     await this.pool.query(
       `CREATE TABLE IF NOT EXISTS modmail.attachments
        (
-           id
-           BIGINT
-           NOT
-           NULL
-           CONSTRAINT
-           attachments_pk
-           PRIMARY
-           KEY,
-           message_id
-           BIGINT
-           NOT
-           NULL
-           CONSTRAINT
-           attachments_messages_modmail_id_fk
-           REFERENCES
-           modmail
-           .
-           messages
-       (
-           modmail_id
-       ),
-          name TEXT NOT NULL,
-          source TEXT NOT NULL,
-          sender BIGINT NOT NULL
+           id         BIGINT                                                NOT NULL
+           CONSTRAINT attachments_pk PRIMARY KEY,
+           message_id BIGINT                                                NOT NULL
+           CONSTRAINT attachments_messages_modmail_id_fk
+           REFERENCES modmail.messages (modmail_id),
+          name       TEXT                                                  NOT NULL,
+          source     TEXT                                                  NOT NULL,
+          sender     BIGINT                                                NOT NULL
           CONSTRAINT attachments_users_id_fk
           REFERENCES modmail.users,
-          type modmail.file_type DEFAULT 'file' :: modmail.file_type NOT NULL
-          );`,
+          type       modmail.file_type DEFAULT 'file' :: modmail.file_type NOT NULL
+          );
+      `,
     );
 
     await this.pool.query(
