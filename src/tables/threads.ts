@@ -30,12 +30,14 @@ export default class ThreadsTable extends Table {
    * @param {string} author
    * @param {string} channelID
    * @param {string} categoryID
+   * @param {boolean} isAdminOnly
    * @returns {Promise<Thread>}
    */
   public async open(
     author: string,
     channelID: string,
     categoryID: string,
+    isAdminOnly: boolean,
   ): Promise<Thread> {
     const threadID = SnowflakeUtil.generate(Date.now());
     await this.pool.query(
@@ -48,6 +50,7 @@ export default class ThreadsTable extends Table {
       author: {
         id: author,
       },
+      isAdminOnly,
       channel: channelID,
       category: categoryID,
       id: threadID,
