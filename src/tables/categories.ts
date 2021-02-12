@@ -45,18 +45,30 @@ export default class CategoriesTable extends Table {
     };
   }
 
-  /**
-   * Set the activity of a category based on a provided emote.
-   * @param {string} id
-   * @param {boolean} active
-   * @returns {Promise<boolean>}
-   */
-  public async setActive(id: string, active: boolean): Promise<boolean> {
+  public async deactivate(id: string): Promise<boolean> {
     const res = await this.pool.query(
       `UPDATE modmail.categories
-       SET is_active=$2
+       SET is_active = false
        WHERE id = $1`,
-      [id, active],
+      [id],
+    );
+
+    await this.pool.query(
+      `UPDATE modmail.categories
+       SET channel_id = null
+       WHERE id = $1`,
+    );
+
+    return res.rowCount !== 0;
+  }
+
+  public async reactivate(id: string, channelID: string): Promise<boolean> {
+    const res = await this.pool.query(
+      `UPDATE modmail.categories
+       SET is_active  = true,
+           channel_id = $2
+       WHERE id = $1`,
+      [id, channelID],
     );
 
     return res.rowCount !== 0;
@@ -147,7 +159,7 @@ export default class CategoriesTable extends Table {
        (
            id          BIGINT               NOT NULL
                CONSTRAINT categories_pk PRIMARY KEY,
-           channel_id  BIGINT UNIQUE        NOT NULL,
+           channel_id  BIGINT UNIQUE,
            name        TEXT                 NOT NULL,
            is_active   BOOLEAN DEFAULT true NOT NULL,
            guild_id    BIGINT               NOT NULL,
@@ -196,7 +208,20 @@ export default class CategoriesTable extends Table {
     // Add description column
     await this.pool.query(
       `ALTER TABLE modmail.categories
-          ADD COLUMN IF NOT EXISTS description TEXT DEFAULT '' NOT NULL;`
+          ADD COLUMN IF NOT EXISTS description TEXT DEFAULT '' NOT NULL;`,
+    );
+
+    // Make channel_id nullable
+    await this.pool.query(
+      `ALTER TABLE modmail.categories
+          ALTER COLUMN channel_id DROP NOT NULL;`,
+    );
+
+    // make inactive categories channel_id nullable
+    await this.pool.query(
+      `UPDATE modmail.categories
+       SET channel_id = null
+       WHERE is_active = false;`,
     );
   }
 
