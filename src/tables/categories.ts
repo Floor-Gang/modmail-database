@@ -4,7 +4,6 @@ import { PoolClient } from 'pg';
 import { SnowflakeUtil } from 'discord.js';
 import Table from '../models/table';
 import {
-  CategoryResolvable,
   CreateCategoryOpt,
 } from '../models/types';
 
@@ -24,20 +23,20 @@ export default class CategoriesTable extends Table {
     const {
       name,
       guildID,
-      emote,
+      emoji,
       channelID,
     } = opt;
     const desc = opt.description || '';
     await this.pool.query(
-      `INSERT INTO modmail.categories (id, name, description, guild_id, emote, channel_id)
+      `INSERT INTO modmail.categories (id, name, description, guild_id, emoji, channel_id)
        VALUES ($1, $2, $3, $4, $5, $6)`,
-      [categoryID, name, desc, guildID, emote, channelID],
+      [categoryID, name, desc, guildID, emoji, channelID],
     );
 
     return {
       channelID,
       description: desc,
-      emojiID: emote,
+      emojiID: emoji,
       guildID,
       id: categoryID,
       isActive: true,
@@ -76,17 +75,17 @@ export default class CategoriesTable extends Table {
   }
 
   /**
-   * Set a unique emote for a given category.
+   * Set a unique emoji for a given category.
    * @param {string} id Category identifier
-   * @param {string} emote New unique emote
+   * @param {string} emoji New unique emote
    * @returns {Promise<boolean>} Whether or not something changed
    */
-  public async setEmote(id: string, emote: string): Promise<boolean> {
+  public async setEmote(id: string, emoji: string): Promise<boolean> {
     const res = await this.pool.query(
       `UPDATE modmail.categories
-       SET emote = $1
+       SET emoji = $1
        WHERE id = $2`,
-      [emote, id],
+      [emoji, id],
     );
 
     return res.rowCount !== 0;
@@ -111,44 +110,77 @@ export default class CategoriesTable extends Table {
 
   /**
    * @method fetchAll
-   * @param {CategoryResolvable} by
-   * @param {string} id
+   * @param {boolean} activeOnly
    * @returns {Promise<Category[]>}
    */
-  public async fetchAll(by: CategoryResolvable, id: string): Promise<Category[]> {
-    const target = CategoriesTable.resolve(by);
-    let parsed: null | boolean = null;
-
-    if (by === CategoryResolvable.activity) {
-      parsed = id === 'true';
+  public async fetchAll(activeOnly = true): Promise<Category[]> {
+    let res;
+    if (activeOnly) {
+      res = await this.pool.query(
+        `SELECT *
+         FROM modmail.categories
+         WHERE is_active = true;`,
+      );
+    } else {
+      res = await this.pool.query(`SELECT *
+                                   FROM modmail.categories;`);
     }
-
-    const res = await this.pool.query(
-      `SELECT * FROM modmail.categories WHERE ${target} = $1`,
-      [parsed || id],
-    );
 
     if (res.rowCount === 0) {
       return [];
     }
 
-    return res.rows.map(CategoriesTable.parse);
+    return res.rows.map((cat) => CategoriesTable.parse(cat));
   }
 
   /**
-   * @method fetch
-   * @param {CategoryResolvable} by
+   * @method fetchByID
    * @param {string} id
    * @returns {Promise<Category | null>}
    */
-  public async fetch(by: CategoryResolvable, id: string): Promise<Category | null> {
-    const res = await this.fetchAll(by, id);
+  public async fetchByID(id: string): Promise<Category | null> {
+    const res = await this.pool.query(
+      `SELECT *
+       FROM modmail.categories
+       WHERE id = $1`,
+      [id],
+    );
 
-    if (res.length === 0) {
+    if (res.rowCount === 0) {
       return null;
     }
 
-    return res[0];
+    return CategoriesTable.parse(res.rows[0]);
+  }
+
+  public async fetchByEmoji(emoji: string): Promise<Category | null> {
+    const res = await this.pool.query(
+      `SELECT *
+       FROM modmail.categories
+       WHERE emoji = $1`,
+      [emoji],
+    );
+
+    if (res.rowCount === 0) {
+      return null;
+    }
+
+    return CategoriesTable.parse(res.rows[0]);
+  }
+
+  public async fetchByName(name: string): Promise<Category | null> {
+    const res = await this.pool.query(
+      `SELECT *
+       FROM modmail.categories
+       WHERE name = $1`,
+      [name],
+    );
+
+    if (res.rowCount === 0) {
+      return null;
+    }
+
+    return CategoriesTable.parse(res.rows[0]);
   }
 
   /**
@@ -164,36 +196,15 @@ export default class CategoriesTable extends Table {
            name        TEXT UNIQUE          NOT NULL,
            is_active   BOOLEAN DEFAULT true NOT NULL,
            guild_id    BIGINT UNIQUE        NOT NULL,
-           emote       TEXT UNIQUE          NOT NULL,
+           emoji       TEXT UNIQUE          NOT NULL,
            description TEXT    DEFAULT ''   NOT NULL
        );`,
     );
   }
 
-  /**
-   * @param {CategoryResolvable} resolvable
-   * @returns {string}
-   */
-  private static resolve(resolvable: CategoryResolvable): string {
-    switch (resolvable) {
-      case CategoryResolvable.name:
-        return 'name';
-      case CategoryResolvable.channel:
-        return 'channel_id';
-      case CategoryResolvable.emote:
-        return 'emote';
-      case CategoryResolvable.activity:
-        return 'is_active';
-      case CategoryResolvable.id:
-        return 'id';
-      case CategoryResolvable.guild:
-        return 'guild_id';
-      default:
-        throw new Error('An invalid resolvable was provided.');
-    }
-  }
-
   protected async migrate(): Promise<void> {
+    let count;
+    let res;
     // Add description column
     await this.pool.query(
       `ALTER TABLE modmail.categories
@@ -218,6 +229,24 @@ export default class CategoriesTable extends Table {
       `CREATE UNIQUE INDEX IF NOT EXISTS categories_guild_id_uindex
           ON modmail.categories (guild_id);`,
     );
+
+    // rename emote to emoji
+    res = await this.pool.query(
+      `SELECT COUNT(*)
+       FROM information_schema.columns
+       WHERE table_schema = 'modmail'
+         AND column_name = 'emote'
+         AND table_name = 'categories'`,
+    );
+    count = res.rows[0].count;
+
+    if (count > 0) {
+      // noinspection SqlResolve
+      await this.pool.query(
+        `ALTER TABLE modmail.categories
+          RENAME COLUMN emote TO emoji;`
+      );
+    }
   }
 
   /**
@@ -228,7 +257,7 @@ export default class CategoriesTable extends Table {
   private static parse(data: DBCategory): Category {
     return {
       channelID: data.channel_id ? data.channel_id.toString() : null,
-      emojiID: data.emote,
+      emojiID: data.emoji,
       description: data.description,
       guildID: data.guild_id.toString(),
       id: data.id.toString(),

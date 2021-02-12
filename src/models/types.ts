@@ -7,14 +7,14 @@ import { FileType } from '@Floor-Gang/modmail-types';
  * @property {string} name New category name
  * @property {string?} description Optional description
  * @property {string} guildID Category guild
- * @property {string} emote A unique emote assigned to the category
+ * @property {string} emoji A unique emote assigned to the category
  * @property {string} channelID Channel category ID to utilize
  */
 export type CreateCategoryOpt = {
     name: string,
     description?: string,
     guildID: string,
-    emote: string,
+    emoji: string,
     channelID: string,
 }
 
@@ -46,23 +46,10 @@ export type CreateStandardReplyOpt = {
     reply: string
 }
 
-/**
- * Fetch a category by any of the following
- * @enum CategoryResolvable
- */
-export enum CategoryResolvable {
-    activity,
-    name,
-    guild,
-    emote,
-    channel,
-    id,
-}
-
 export type DBCategory = {
     is_active: boolean,
     channel_id: number | null,
-    emote: string,
+    emoji: string,
     description: string,
     guild_id: number,
     id: number,
