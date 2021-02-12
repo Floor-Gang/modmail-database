@@ -232,7 +232,7 @@ export default class CategoriesTable extends Table {
    */
   private static parse(data: DBCategory): Category {
     return {
-      channelID: data.channel_id.toString(),
+      channelID: data.channel_id ? data.channel_id.toString() : null,
       emojiID: data.emote,
       description: data.description,
       guildID: data.guild_id.toString(),

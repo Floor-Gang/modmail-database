@@ -10,7 +10,7 @@
     "prepublish": "tsc"
   },
   "dependencies": {
-    "@Floor-Gang/modmail-types": "^1.5.1",
+    "@Floor-Gang/modmail-types": "^1.6.0",
     "@types/pg": "^7.14.7",
     "discord.js": "^12.5.1",
     "pg": "^8.5.1"
