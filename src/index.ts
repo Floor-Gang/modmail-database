@@ -12,7 +12,6 @@ import {
   CreateCategoryOpt,
   CreateAttachmentOpt,
   CreateStandardReplyOpt,
-  CategoryResolvable,
 } from './models/types';
 
 export {
@@ -29,6 +28,5 @@ export {
   CreateCategoryOpt,
   CreateAttachmentOpt,
   CreateStandardReplyOpt,
-  CategoryResolvable,
 };
 
