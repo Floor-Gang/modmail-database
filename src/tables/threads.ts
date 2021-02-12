@@ -183,15 +183,17 @@ export default class ThreadsTable extends Table {
     return ThreadsTable.parse(res.rows[0]);
   }
 
-  public async updateThread(
+  public async forward(
     threadID: string,
-    channelID: string,
     categoryID: string,
-  ): Promise<void> {
-    await this.pool.query(
-      'UPDATE modmail.threads SET channel = $1, category = $2 WHERE id = $3;',
-      [channelID, categoryID, threadID],
+    channelID: string,
+  ): Promise<boolean> {
+    const res = await this.pool.query(
+      `UPDATE modmail.threads SET category = $2, channel = $3 WHERE id = $1`,
+      [threadID, categoryID, channelID],
     );
+
+    return res.rowCount > 0;
   }
 
   /**
