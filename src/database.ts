@@ -56,11 +56,11 @@ export default class DatabaseManager {
 
       // Initialize schema and enums
       await db.init();
-      // Initialie users first
+      // Initialize users first
       await db.users.validate();
       // Initialize categories second
       await db.categories.validate();
-      // Intiialize threads third
+      // Initialize threads third
       await db.threads.validate();
       // Initialize messages fourth
       await db.messages.validate();
