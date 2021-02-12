@@ -27,14 +27,16 @@ export default class CategoriesTable extends Table {
       emote,
       channelID,
     } = opt;
+    const desc = opt.description || '';
     await this.pool.query(
-      `INSERT INTO modmail.categories (id, name, guild_id, emote, channel_id)
-       VALUES ($1, $2, $3, $4, $5)`,
-      [categoryID, name, guildID, emote, channelID],
+      `INSERT INTO modmail.categories (id, name, description, guild_id, emote, channel_id)
+       VALUES ($1, $2, $3, $4, $5, $6)`,
+      [categoryID, name, desc, guildID, emote, channelID],
     );
 
     return {
       channelID,
+      description: desc,
       emojiID: emote,
       guildID,
       id: categoryID,
@@ -143,13 +145,14 @@ export default class CategoriesTable extends Table {
     await this.pool.query(
       `CREATE TABLE IF NOT EXISTS modmail.categories
        (
-           id         BIGINT               NOT NULL
+           id          BIGINT               NOT NULL
                CONSTRAINT categories_pk PRIMARY KEY,
-           channel_id BIGINT UNIQUE        NOT NULL,
-           name       TEXT                 NOT NULL,
-           is_active  BOOLEAN DEFAULT true NOT NULL,
-           guild_id   BIGINT               NOT NULL,
-           emote      TEXT                 NOT NULL
+           channel_id  BIGINT UNIQUE        NOT NULL,
+           name        TEXT                 NOT NULL,
+           is_active   BOOLEAN DEFAULT true NOT NULL,
+           guild_id    BIGINT               NOT NULL,
+           emote       TEXT                 NOT NULL,
+           description TEXT    DEFAULT ''   NOT NULL
        );`,
     );
 
@@ -189,6 +192,14 @@ export default class CategoriesTable extends Table {
     }
   }
 
+  protected async migrate(): Promise<void> {
+    // Add description column
+    await this.pool.query(
+      `ALTER TABLE modmail.categories
+          ADD COLUMN IF NOT EXISTS description TEXT DEFAULT '' NOT NULL;`
+    );
+  }
+
   /**
    * @method parse
    * @param {DBCategory} data
@@ -198,6 +209,7 @@ export default class CategoriesTable extends Table {
     return {
       channelID: data.channel_id.toString(),
       emojiID: data.emote,
+      description: data.description,
       guildID: data.guild_id.toString(),
       id: data.id.toString(),
       isActive: data.is_active,

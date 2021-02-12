@@ -5,12 +5,14 @@ import { FileType } from '@Floor-Gang/modmail-types';
  * CreateCategoryOpt is used by ICategoryManager.create()
  * @type CreateCategoryOpt
  * @property {string} name New category name
+ * @property {string?} description Optional description
  * @property {string} guildID Category guild
  * @property {string} emote A unique emote assigned to the category
  * @property {string} channelID Channel category ID to utilize
  */
 export type CreateCategoryOpt = {
     name: string,
+    description?: string,
     guildID: string,
     emote: string,
     channelID: string,
@@ -61,6 +63,7 @@ export type DBCategory = {
     is_active: boolean,
     channel_id: number,
     emote: string,
+    description: string,
     guild_id: number,
     id: number,
     name: string,
