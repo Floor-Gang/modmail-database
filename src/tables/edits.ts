@@ -7,8 +7,8 @@ export default class EditsTable extends Table {
     super(pool, 'edits');
   }
 
-  public async add(edit: Edit): Promise<number> {
-    const version = await this.pool.query(
+  public async add(content: string, msgID: string): Promise<Edit> {
+    const res = await this.pool.query(
       `WITH last_version (num) AS (
           SELECT coalesce(
                          (SELECT version
@@ -21,10 +21,14 @@ export default class EditsTable extends Table {
        INTO modmail.edits (content, message, version)
        VALUES ($1, $2, (SELECT num FROM last_version) + 1)
        RETURNING version;`,
-      [edit.content, edit.message],
+      [content, msgID],
     );
 
-    return version.rows[0].version;
+    return {
+      content,
+      message: msgID,
+      version: res.rows[0].version,
+    }
   }
 
   public async fetch(msgID: string): Promise<Edit[]> {
