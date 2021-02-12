@@ -17,7 +17,8 @@ export default class PermissionsTable extends Table {
   public async add(role: Role): Promise<boolean> {
     const level = PermUtil.resolve(role.level);
     const res = await this.pool.query(
-      `INSERT INTO ${this.name} (category_id, role_id, level) VALUES ($1, $2, $3)`,
+      `INSERT INTO modmail.permissions (category_id, role_id, level)
+       VALUES ($1, $2, $3);`,
       [role.category, role.roleID, level],
     );
 
@@ -32,7 +33,9 @@ export default class PermissionsTable extends Table {
    */
   public async remove(id: string): Promise<boolean> {
     const res = await this.pool.query(
-      `DELETE FROM ${this.name} WHERE role_id=$1`,
+      `DELETE
+       FROM modmail.permissions
+       WHERE role_id = $1;`,
       [id],
     );
 
@@ -41,7 +44,9 @@ export default class PermissionsTable extends Table {
 
   public async fetch(roleID: string): Promise<Role | null> {
     const res = await this.pool.query(
-      `SELECT * FROM ${this.name} WHERE role_id=$1`,
+      `SELECT *
+       FROM modmail.permissions
+       WHERE role_id = $1;`,
       [roleID],
     );
 
@@ -54,7 +59,9 @@ export default class PermissionsTable extends Table {
 
   public async fetchFrom(roleIDs: string[]): Promise<Role[]> {
     const res = await this.pool.query(
-      `SELECT * FROM ${this.name} WHERE role_id = ANY ($1)`,
+      `SELECT *
+       FROM modmail.permissions
+       WHERE role_id = ANY ($1);`,
       [roleIDs],
     );
 
@@ -63,7 +70,9 @@ export default class PermissionsTable extends Table {
 
   public async fetchAll(category: string): Promise<Role[]> {
     const res = await this.pool.query(
-      `SELECT * FROM ${this.name} WHERE category_id=$1`,
+      `SELECT *
+       FROM modmail.permissions
+       WHERE category_id = $1;`,
       [category],
     );
 
@@ -71,19 +80,21 @@ export default class PermissionsTable extends Table {
   }
 
   /**
-   * Initialize the permisisons table
+   * Initialize the permissions table
    */
   protected async init(): Promise<void> {
     await this.pool.query(
-      `CREATE TABLE IF NOT EXISTS ${this.name} (`
-      + ' category_id bigint not null'
-      + '   references modmail.categories,'
-      + ' role_id text unique not null,'
-      + " level modmail.role_level default 'mod'::modmail.role_level not null)",
+      `CREATE TABLE IF NOT EXISTS modmail.permissions
+       (
+           category_id BIGINT                                                 NOT NULL
+               references modmail.categories,
+           role_id     TEXT UNIQUE                                            NOT NULL,
+           level       modmail.role_level DEFAULT \'mod\'::modmail.role_level NOT NULL
+       )`
     );
 
     await this.pool.query(
-      `CREATE UNIQUE INDEX IF NOT EXISTS permissions_role_id_uindex on ${this.name} (role_id)`,
+      `CREATE UNIQUE INDEX IF NOT EXISTS permissions_role_id_uindex on modmail.permissions (role_id)`,
     );
   }
 

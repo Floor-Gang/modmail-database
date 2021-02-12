@@ -10,8 +10,7 @@ export default class MutesTable extends Table {
 
   /**
    * Mute a user for a category
-   * @param {string} userID
-   * @param {string} categoryID
+   * @param {MuteStatus} mute
    * @returns {Promise<boolean>}
    */
   public async add(mute: MuteStatus): Promise<boolean> {
@@ -22,8 +21,8 @@ export default class MutesTable extends Table {
     }
 
     await this.pool.query(
-      `INSERT INTO ${this.name} (user_id, category_id, till, reason)`
-      + ' VALUES ($1, $2, $3, $4);',
+      `INSERT INTO modmail.mutes (user_id, category_id, till, reason)
+       VALUES ($1, $2, $3, $4);`,
       [mute.user, mute.category, mute.till, mute.reason],
     );
     return true;
@@ -37,8 +36,11 @@ export default class MutesTable extends Table {
    */
   public async delete(user: string, category: string): Promise<boolean> {
     const res = await this.pool.query(
-      `DELETE FROM ${this.name}`
-      + ' WHERE user_id=$1 AND category_id=$2 AND till > $3',
+      `DELETE
+       FROM modmail.mutes
+       WHERE user_id = $1
+         AND category_id = $2
+         AND till > $3;`,
       [user, category, Date.now()],
     );
 
@@ -52,7 +54,9 @@ export default class MutesTable extends Table {
    */
   public async fetchAll(user: string): Promise<MuteStatus[]> {
     const res = await this.pool.query(
-      `SELECT * FROM ${this.name} WHERE user_id=$1`,
+      `SELECT *
+       FROM modmail.mutes
+       WHERE user_id = $1`,
       [user],
     );
 
@@ -101,7 +105,10 @@ export default class MutesTable extends Table {
    */
   public async remove(user: string, category: string): Promise<boolean> {
     const res = await this.pool.query(
-      `DELETE FROM ${this.name} WHERE user_id=$1 AND category_id=$2`,
+      `DELETE
+       FROM modmail.mutes
+       WHERE user_id = $1
+         AND category_id = $2;`,
       [user, category],
     );
 
@@ -113,13 +120,15 @@ export default class MutesTable extends Table {
    */
   protected async init(): Promise<void> {
     await this.pool.query(
-      `CREATE TABLE IF NOT EXISTS ${this.name} (`
-      + ' user_id bigint not null'
-      + '   constraint threads_users_id_fk'
-      + `   references modmail.users,`
-      + ' till bigint not null,'
-      + ' category_id bigint not null,'
-      + ' reason text not null)',
+      `CREATE TABLE IF NOT EXISTS modmail.mutes
+       (
+           user_id     BIGINT NOT NULL
+               CONSTRAINT threads_users_id_fk
+                   REFERENCES modmail.users,
+           till        BIGINT NOT NULL,
+           category_id BIGINT NOT NULL,
+           reason      text   NOT NULL
+       )`,
     );
   }
 

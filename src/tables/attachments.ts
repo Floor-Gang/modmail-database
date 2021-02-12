@@ -16,9 +16,8 @@ export default class AttachmentsTable extends Table {
     const id = SnowflakeUtil.generate(Date.now());
     const type = opt.type === FileType.Image ? 'image' : 'file';
     await this.pool.query(
-      `INSERT INTO ${this.name} `
-      + '(id, message_id, name, source, sender, type) '
-      + 'VALUES ($1, $2, $3, $4, $5, $6)',
+      `INSERT INTO modmail.attachments (id, message_id, name, source, sender, type)
+       VALUES ($1, $2, $3, $4, $5, $6);`,
       [id, opt.messageID, opt.name, opt.source, opt.sender, type],
     );
   }
@@ -28,21 +27,24 @@ export default class AttachmentsTable extends Table {
    */
   protected async init(): Promise<void> {
     await this.pool.query(
-      `CREATE TABLE IF NOT EXISTS ${this.name} (`
-      + ' id bigint not null constraint attachments_pk primary key,'
-      + ' message_id bigint not null'
-      + '   constraint attachments_messages_modmail_id_fk'
-      + '   references modmail.messages (modmail_id),'
-      + ' name text not null,'
-      + ' source text not null,'
-      + ' sender bigint not null'
-      + '   constraint attachments_users_id_fk'
-      + '   references modmail.users,'
-      + " type modmail.file_type default 'file' :: modmail.file_type not null)",
-    );
+`CREATE TABLE IF NOT EXISTS modmail.attachments
+(
+    id         BIGINT                                                NOT NULL
+    CONSTRAINT attachments_pk PRIMARY KEY,
+    message_id BIGINT                                                NOT NULL
+    CONSTRAINT attachments_messages_modmail_id_fk
+    REFERENCES modmail.messages (modmail_id),
+    name       TEXT                                                  NOT NULL,
+    source     TEXT                                                  NOT NULL,
+    sender     BIGINT                                                NOT NULL
+    CONSTRAINT attachments_users_id_fk
+    REFERENCES modmail.users,
+    TYPE       modmail.file_type DEFAULT 'file' :: modmail.file_type NOT NULL
+);`,
+      );
 
     await this.pool.query(
-      `CREATE UNIQUE INDEX IF NOT EXISTS attachments_id_uindex ON ${this.name} (id);`,
+      `CREATE UNIQUE INDEX IF NOT EXISTS attachments_id_uindex ON modmail.attachments (id);`,
     );
   }
 }

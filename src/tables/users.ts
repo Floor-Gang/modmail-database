@@ -13,7 +13,9 @@ export default class UsersTable extends Table {
    */
   public async create(id: string): Promise<void> {
     await this.pool.query(
-      `INSERT INTO ${this.name} (id) VALUES ($1) ON CONFLICT (id) DO NOTHING;`,
+      `INSERT INTO modmail.users (id)
+       VALUES ($1)
+       ON CONFLICT (id) DO NOTHING;`,
       [id],
     );
   }
@@ -23,12 +25,15 @@ export default class UsersTable extends Table {
    */
   protected async init(): Promise<void> {
     await this.pool.query(
-      `CREATE TABLE IF NOT EXISTS ${this.name} (`
-      + ' id bigint not null constraint users_pk primary key)',
+      `CREATE TABLE IF NOT EXISTS modmail.users
+       (
+           id BIGINT NOT NULL
+               CONSTRAINT users_pk PRIMARY KEY
+       )`,
     );
 
     await this.pool.query(
-      `CREATE UNIQUE INDEX IF NOT EXISTS users_id_uindex ON ${this.name} (id);`,
+      `CREATE UNIQUE INDEX IF NOT EXISTS users_id_uindex ON modmail.users (id);`,
     );
   }
 }

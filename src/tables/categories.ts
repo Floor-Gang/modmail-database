@@ -22,11 +22,14 @@ export default class CategoriesTable extends Table {
   public async create(opt: CreateCategoryOpt): Promise<Category> {
     const categoryID = SnowflakeUtil.generate(Date.now());
     const {
-      name, guildID, emote, channelID,
+      name,
+      guildID,
+      emote,
+      channelID,
     } = opt;
     await this.pool.query(
-      `INSERT INTO ${this.name} (id, name, guild_id, emote, channel_id)`
-      + ' VALUES ($1, $2, $3, $4, $5)',
+      `INSERT INTO modmail.categories (id, name, guild_id, emote, channel_id)
+       VALUES ($1, $2, $3, $4, $5)`,
       [categoryID, name, guildID, emote, channelID],
     );
 
@@ -48,7 +51,9 @@ export default class CategoriesTable extends Table {
    */
   public async setActive(id: string, active: boolean): Promise<boolean> {
     const res = await this.pool.query(
-      `UPDATE ${this.name} SET is_active=$2 WHERE id=$1`,
+      `UPDATE modmail.categories
+       SET is_active=$2
+       WHERE id = $1`,
       [id, active],
     );
 
@@ -63,7 +68,9 @@ export default class CategoriesTable extends Table {
    */
   public async setEmote(id: string, emote: string): Promise<boolean> {
     const res = await this.pool.query(
-      `UPDATE ${this.name} SET emote = $1 WHERE id = $2`,
+      `UPDATE modmail.categories
+       SET emote = $1
+       WHERE id = $2`,
       [emote, id],
     );
 
@@ -78,7 +85,9 @@ export default class CategoriesTable extends Table {
    */
   public async setName(id: string, name: string): Promise<boolean> {
     const res = await this.pool.query(
-      `UPDATE ${this.name} SET name = $1 WHERE id = $2`,
+      `UPDATE modmail.categories
+       SET name = $1
+       WHERE id = $2`,
       [name, id],
     );
 
@@ -100,7 +109,7 @@ export default class CategoriesTable extends Table {
     }
 
     const res = await this.pool.query(
-      `SELECT * FROM ${this.name} WHERE ${target} = $1`,
+      `SELECT * FROM modmail.categories WHERE ${target} = $1`,
       [parsed || id],
     );
 
@@ -132,25 +141,28 @@ export default class CategoriesTable extends Table {
    */
   protected async init(): Promise<void> {
     await this.pool.query(
-      `CREATE TABLE IF NOT EXISTS ${this.name} (`
-      + ' id bigint not null constraint categories_pk primary key,'
-      + ' channel_id bigint unique not null,'
-      + ' name text not null,'
-      + ' is_active boolean default true not null,'
-      + ' guild_id bigint not null,'
-      + ' emote text not null)',
+      `CREATE TABLE IF NOT EXISTS modmail.categories
+       (
+           id         BIGINT               NOT NULL
+               CONSTRAINT categories_pk PRIMARY KEY,
+           channel_id BIGINT UNIQUE        NOT NULL,
+           name       TEXT                 NOT NULL,
+           is_active  BOOLEAN DEFAULT true NOT NULL,
+           guild_id   BIGINT               NOT NULL,
+           emote      TEXT                 NOT NULL
+       );`,
     );
 
     await this.pool.query(
-      `CREATE UNIQUE INDEX IF NOT EXISTS categories_emote_uindex ON ${this.name} (emote);`,
+      `CREATE UNIQUE INDEX IF NOT EXISTS categories_emote_uindex ON modmail.categories (emote);`,
     );
 
     await this.pool.query(
-      `CREATE UNIQUE INDEX IF NOT EXISTS categories_id_uindex ON ${this.name} (id);`,
+      `CREATE UNIQUE INDEX IF NOT EXISTS categories_id_uindex ON modmail.categories (id);`,
     );
 
     await this.pool.query(
-      `CREATE UNIQUE INDEX IF NOT EXISTS categories_name_uindex ON ${this.name} (name);`,
+      `CREATE UNIQUE INDEX IF NOT EXISTS categories_name_uindex ON modmail.categories (name);`,
     );
   }
 

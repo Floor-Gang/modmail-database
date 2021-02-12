@@ -17,7 +17,9 @@ export default class ThreadsTable extends Table {
    */
   public async close(id: string): Promise<boolean> {
     const res = await this.pool.query(
-      `UPDATE ${this.name} SET is_active = false WHERE channel = $1`,
+      `UPDATE modmail.threads
+       SET is_active = false
+       WHERE channel = $1;`,
       [id],
     );
 
@@ -37,8 +39,8 @@ export default class ThreadsTable extends Table {
   ): Promise<Thread> {
     const threadID = SnowflakeUtil.generate(Date.now());
     await this.pool.query(
-      `INSERT INTO ${this.name} (id, author, channel, category)`
-      + ' VALUES ($1, $2, $3, $4)',
+      `INSERT INTO modmail.threads (id, author, channel, category)
+       VALUES ($1, $2, $3, $4);`,
       [threadID, author, channelID, categoryID],
     );
 
@@ -61,7 +63,10 @@ export default class ThreadsTable extends Table {
    */
   public async countUser(user: string): Promise<number> {
     const res = await this.pool.query(
-      `SELECT COUNT(*) FROM ${this.name} WHERE author = $1 AND is_active = false`,
+      `SELECT COUNT(*)
+       FROM modmail.threads
+       WHERE author = $1
+         AND is_active = false;`,
       [user],
     );
 
@@ -70,7 +75,11 @@ export default class ThreadsTable extends Table {
 
   public async countCategory(category: string): Promise<number> {
     const res = await this.pool.query(
-      `SELECT COUNT(*) FROM ${this.name} WHERE category = $1 AND is_active = true`,
+      `SELECT COUNT(*)
+       FROM modmail.threads
+       WHERE category = $1
+         AND is_active = true;`,
+      [category],
     );
 
     return res.rows[0].count;
@@ -78,7 +87,11 @@ export default class ThreadsTable extends Table {
 
   public async getByUser(userID: string): Promise<Thread | null> {
     const res = await this.pool.query(
-      `SELECT * FROM ${this.name} WHERE author = $1 AND is_active = true LIMIT 1`,
+      `SELECT *
+       FROM modmail.threads
+       WHERE author = $1
+         AND is_active = true
+       LIMIT 1;`,
       [userID],
     );
 
@@ -95,7 +108,11 @@ export default class ThreadsTable extends Table {
    */
   public async getCurrentThread(user: string): Promise<Thread | null> {
     const res = await this.pool.query(
-      `SELECT * FROM ${this.name} WHERE author = $1 AND is_active = true LIMIT 1`,
+      `SELECT *
+       FROM modmail.threads
+       WHERE author = $1
+         AND is_active = true
+       LIMIT 1;`,
       [user],
     );
     if (res.rowCount === 0) {
@@ -111,7 +128,11 @@ export default class ThreadsTable extends Table {
    */
   public async getByChannel(channelID: string): Promise<Thread | null> {
     const res = await this.pool.query(
-      `SELECT * FROM ${this.name} WHERE channel = $1 AND is_active = true LIMIT 1`,
+      `SELECT *
+       FROM modmail.threads
+       WHERE channel = $1
+         AND is_active = true
+       LIMIT 1;`,
       [channelID],
     );
 
@@ -129,7 +150,10 @@ export default class ThreadsTable extends Table {
    */
   public async getByCategory(catID: string): Promise<Thread[]> {
     const res = await this.pool.query(
-      `SELECT * FROM ${this.name} WHERE category = $1 ORDER BY id DESC`,
+      `SELECT *
+       FROM modmail.threads
+       WHERE category = $1
+       ORDER BY id DESC;`,
       [catID],
     );
 
@@ -143,7 +167,9 @@ export default class ThreadsTable extends Table {
    */
   public async getByID(threadID: string): Promise<Thread | null> {
     const res = await this.pool.query(
-      `SELECT * FROM ${this.name} WHERE id = $1`,
+      `SELECT *
+       FROM modmail.threads
+       WHERE id = $1;`,
       [threadID],
     );
 
@@ -159,29 +185,31 @@ export default class ThreadsTable extends Table {
    */
   protected async init(): Promise<void> {
     await this.pool.query(
-      `CREATE TABLE IF NOT EXISTS ${this.name} (`
-      + ' id bigint not null'
-      + '   constraint threads_pk primary key,'
-      + ' author bigint not null'
-      + '   constraint threads_users_id_fk'
-      + '   references modmail.users,'
-      + ' channel bigint not null,'
-      + ' is_active boolean default true not null,'
-      + ' category bigint not null'
-      + '   constraint threads_categories_id_fk'
-      + '   references modmail.categories);',
+      `CREATE TABLE IF NOT EXISTS modmail.threads
+       (
+           id        BIGINT               NOT NULL
+               CONSTRAINT threads_pk PRIMARY KEY,
+           author    BIGINT               NOT NULL
+               CONSTRAINT threads_users_id_fk
+                   REFERENCES modmail.users,
+           channel   BIGINT               NOT NULL,
+           is_active BOOLEAN DEFAULT true NOT NULL,
+           category  BIGINT               NOT NULL
+               CONSTRAINT threads_categories_id_fk
+                   REFERENCES modmail.categories
+       );`,
     );
 
     await this.pool.query(
-      `CREATE UNIQUE INDEX IF NOT EXISTS threads_channel_uindex ON ${this.name} (channel);`,
+      `CREATE UNIQUE INDEX IF NOT EXISTS threads_channel_uindex ON modmail.threads (channel);`,
     );
 
     await this.pool.query(
-      `CREATE UNIQUE INDEX IF NOT EXISTS threads_channel_uindex_2 ON ${this.name} (channel);`,
+      `CREATE UNIQUE INDEX IF NOT EXISTS threads_channel_uindex_2 ON modmail.threads (channel);`,
     );
 
     await this.pool.query(
-      `CREATE UNIQUE INDEX IF NOT EXISTS threads_id_uindex ON ${this.name} (id);`,
+      `CREATE UNIQUE INDEX IF NOT EXISTS threads_id_uindex ON modmail.threads (id);`,
     );
   }
 
@@ -202,7 +230,7 @@ export default class ThreadsTable extends Table {
     categoryID: string,
   ): Promise<void> {
     await this.pool.query(
-      'UPDATE modmail.threads SET channel = $1, category = $2 WHERE id = $3',
+      'UPDATE modmail.threads SET channel = $1, category = $2 WHERE id = $3;',
       [channelID, categoryID, threadID],
     );
   }

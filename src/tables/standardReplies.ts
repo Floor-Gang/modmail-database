@@ -17,7 +17,8 @@ export default class StandardRepliesTable extends Table {
   public async create(opt: CreateStandardReplyOpt): Promise<void> {
     const id = SnowflakeUtil.generate(Date.now());
     await this.pool.query(
-      `INSERT INTO ${this.name} (id, name, reply) VALUES ($1::bigint, $2, $3)`,
+      `INSERT INTO modmail.standard_replies (id, name, reply)
+       VALUES ($1::BIGINT, $2, $3);`,
       [id, opt.name, opt.reply],
     );
   }
@@ -28,7 +29,9 @@ export default class StandardRepliesTable extends Table {
    */
   public async remove(name: string): Promise<void> {
     await this.pool.query(
-      `DELETE FROM ${this.name} WHERE name = $1`,
+      `DELETE
+       FROM modmail.standard_replies
+       WHERE name = $1;`,
       [name],
     );
   }
@@ -40,7 +43,11 @@ export default class StandardRepliesTable extends Table {
    */
   public async update(opt: CreateStandardReplyOpt, id: string): Promise<void> {
     await this.pool.query(
-      `UPDATE ${this.name} SET reply = $1, name = $2 WHERE id = $3::bigint OR name = $3`,
+      `UPDATE modmail.standard_replies
+       SET reply = $1,
+           name  = $2
+       WHERE id = $3::bigint
+          OR name = $3;`,
       [opt.reply, opt.name, id],
     );
   }
@@ -52,7 +59,9 @@ export default class StandardRepliesTable extends Table {
    */
   public async get(name: string): Promise<StandardReply | null> {
     const res = await this.pool.query(
-      `SELECT * FROM ${this.name} WHERE name = $1`,
+      `SELECT *
+       FROM modmail.standard_replies
+       WHERE name = $1;`,
       [name.toLowerCase()],
     );
     if (res.rowCount === 0) {
@@ -66,19 +75,21 @@ export default class StandardRepliesTable extends Table {
    */
   protected async init(): Promise<void> {
     await this.pool.query(
-      `CREATE TABLE IF NOT EXISTS ${this.name} (`
-      + ' id bigint not null'
-      + '   constraint standard_replies_pk primary key,'
-      + ' name text not null,'
-      + ' reply text not null);',
+      `CREATE TABLE IF NOT EXISTS modmail.standard_replies
+       (
+           id    BIGINT NOT NULL
+               CONSTRAINT standard_replies_pk PRIMARY KEY,
+           name  TEXT   NOT NULL,
+           reply TEXT   NOT NULL
+       );`
     );
 
     await this.pool.query(
-      `CREATE UNIQUE INDEX IF NOT EXISTS standard_replies_id_uindex ON ${this.name} (id);`,
+      `CREATE UNIQUE INDEX IF NOT EXISTS standard_replies_id_uindex ON modmail.standard_replies (id);`,
     );
 
     await this.pool.query(
-      `CREATE UNIQUE INDEX IF NOT EXISTS standard_replies_name_uindex ON ${this.name} (name);`,
+      `CREATE UNIQUE INDEX IF NOT EXISTS standard_replies_name_uindex ON modmail.standard_replies (name);`,
     );
   }
 
