@@ -41,9 +41,9 @@ export default class ThreadsTable extends Table {
   ): Promise<Thread> {
     const threadID = SnowflakeUtil.generate(Date.now());
     await this.pool.query(
-      `INSERT INTO modmail.threads (id, author, channel, category)
-       VALUES ($1, $2, $3, $4);`,
-      [threadID, author, channelID, categoryID],
+      `INSERT INTO modmail.threads (id, author, channel, category, is_admin_only)
+       VALUES ($1, $2, $3, $4, $5);`,
+      [threadID, author, channelID, categoryID, isAdminOnly],
     );
 
     return {
