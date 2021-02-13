@@ -83,7 +83,6 @@ export type DBMuteStatus = {
 export type DBStandardReply = {
     reply: string,
     name: string,
-    id: bigint,
 }
 
 export type DBRole = {

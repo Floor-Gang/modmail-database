@@ -123,7 +123,6 @@ export default class StandardRepliesTable extends Table {
    */
   private static parse(row: DBStandardReply): StandardReply {
     return {
-      id: row.id.toString(),
       name: row.name,
       reply: row.reply,
     };
