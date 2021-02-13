@@ -1,9 +1,7 @@
 import { StandardReply } from '@Floor-Gang/modmail-types';
 import { DBStandardReply } from '../models/types';
 import { PoolClient } from 'pg';
-import { SnowflakeUtil } from 'discord.js';
 import Table from '../models/table';
-import { CreateStandardReplyOpt } from '../models/types';
 
 export default class StandardRepliesTable extends Table {
   constructor(pool: PoolClient) {
@@ -12,14 +10,14 @@ export default class StandardRepliesTable extends Table {
 
   /**
    * Create a new standard reply
-   * @param {string} opt
+   * @param name
+   * @param reply
    */
-  public async create(opt: CreateStandardReplyOpt): Promise<void> {
-    const id = SnowflakeUtil.generate(Date.now());
+  public async create(name: string, reply: string): Promise<void> {
     await this.pool.query(
-      `INSERT INTO modmail.standard_replies (id, name, reply)
-       VALUES ($1::BIGINT, $2, $3);`,
-      [id, opt.name, opt.reply],
+      `INSERT INTO modmail.standard_replies (name, reply)
+       VALUES (LOWER($1), $2);`,
+      [name, reply],
     );
   }
 
@@ -31,24 +29,22 @@ export default class StandardRepliesTable extends Table {
     await this.pool.query(
       `DELETE
        FROM modmail.standard_replies
-       WHERE name = $1;`,
+       WHERE name = LOWER($1);`,
       [name],
     );
   }
 
   /**
    * Update a standard reply
-   * @param {string} opt
-   * @param {string} id
+   * @param {string} name
+   * @param {string} reply
    */
-  public async update(opt: CreateStandardReplyOpt, id: string): Promise<void> {
+  public async update(name: string, reply: string): Promise<void> {
     await this.pool.query(
       `UPDATE modmail.standard_replies
-       SET reply = $1,
-           name  = $2
-       WHERE id = $3::bigint
-          OR name = $3;`,
-      [opt.reply, opt.name, id],
+       SET reply = $2
+       WHERE name = LOWER($1)`,
+      [name, reply],
     );
   }
 
@@ -61,7 +57,7 @@ export default class StandardRepliesTable extends Table {
     const res = await this.pool.query(
       `SELECT *
        FROM modmail.standard_replies
-       WHERE name = $1;`,
+       WHERE name = LOWER($1);`,
       [name.toLowerCase()],
     );
     if (res.rowCount === 0) {
@@ -72,7 +68,8 @@ export default class StandardRepliesTable extends Table {
 
   public async fetchAll(): Promise<StandardReply[]> {
     const res = await this.pool.query(
-      `SELECT * FROM modmail.standard_replies;`,
+      `SELECT *
+       FROM modmail.standard_replies;`,
     );
 
     return res.rows.map((sr) => StandardRepliesTable.parse(sr));
@@ -85,20 +82,38 @@ export default class StandardRepliesTable extends Table {
     await this.pool.query(
       `CREATE TABLE IF NOT EXISTS modmail.standard_replies
        (
-           id    BIGINT NOT NULL
-               CONSTRAINT standard_replies_pk PRIMARY KEY,
-           name  TEXT   NOT NULL,
-           reply TEXT   NOT NULL
+           name  TEXT PRIMARY KEY NOT NULL,
+           reply TEXT             NOT NULL
        );`
     );
+  }
 
-    await this.pool.query(
-      `CREATE UNIQUE INDEX IF NOT EXISTS standard_replies_id_uindex ON modmail.standard_replies (id);`,
+  protected async migrate(): Promise<void> {
+    const res = await this.pool.query(
+      `SELECT COUNT(*)
+       FROM information_schema.columns
+       WHERE table_name = 'standard_replies'
+         AND table_schema = 'modmail'
+         AND column_name = 'id';`
     );
+    const count = res.rows[0].count;
 
-    await this.pool.query(
-      `CREATE UNIQUE INDEX IF NOT EXISTS standard_replies_name_uindex ON modmail.standard_replies (name);`,
-    );
+    // remove ID & set all names to lowercase
+    if (count > 0) {
+      // noinspection SqlResolve
+      await this.pool.query(
+        `ALTER TABLE modmail.standard_replies
+            DROP COLUMN id;`,
+      );
+      await this.pool.query(
+        `CREATE UNIQUE INDEX IF NOT EXISTS standard_replies_name_uindex
+            ON modmail.standard_replies (name);`,
+      );
+      await this.pool.query(
+        `UPDATE modmail.standard_replies
+         SET name=LOWER(name);`,
+      );
+    }
   }
 
   /**

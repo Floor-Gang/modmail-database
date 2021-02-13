@@ -35,17 +35,6 @@ export type CreateAttachmentOpt = {
     type: FileType,
 }
 
-/**
- * CreateStandardReplyOpt is ued my IStandardRepliesManager.create()
- * @type CreateStandardReplyOpt
- * @property {string} name
- * @property {string} reply
- */
-export type CreateStandardReplyOpt = {
-    name: string,
-    reply: string
-}
-
 export type DBAttachment = {
     id: number,
     message_id: number,

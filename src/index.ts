@@ -11,7 +11,6 @@ import UsersTable from './tables/users';
 import {
   CreateCategoryOpt,
   CreateAttachmentOpt,
-  CreateStandardReplyOpt,
 } from './models/types';
 
 export {
@@ -27,6 +26,5 @@ export {
   UsersTable,
   CreateCategoryOpt,
   CreateAttachmentOpt,
-  CreateStandardReplyOpt,
 };
 
