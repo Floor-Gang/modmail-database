@@ -18,7 +18,10 @@ export default class ThreadsTable extends Table {
     return res.rows;
   }
 
-  public async history(userID: string): Promise<Thread[]> {
+  public async history(
+    userID: string,
+    catID: string | null = null,
+  ): Promise<Thread[]> {
     let res;
     res = await this.pool.query(
       `SELECT DISTINCT thread_id FROM modmail.messages WHERE sender = $1`,
@@ -26,11 +29,21 @@ export default class ThreadsTable extends Table {
     );
 
     const threadIDs: string[] = res.rows;
-    res = await this.pool.query(
-      `SELECT * FROM modmail.threads WHERE id = ANY ($1) ORDER BY id`,
-      [threadIDs],
-    );
-
+    if (catID === null) {
+      res = await this.pool.query(
+        `SELECT * FROM modmail.threads WHERE id = ANY ($1) ORDER BY id`,
+        [threadIDs],
+      );
+    } else {
+      res = await this.pool.query(
+        `SELECT * FROM modmail.threads
+           WHERE category = $2
+           AND id = ANY ($1)
+           ORDER BY id;`,
+        [threadIDs, catID],
+      );
+    }
+    
     return res.rows.map((thread) => ThreadsTable.parse(thread));
   }
 
