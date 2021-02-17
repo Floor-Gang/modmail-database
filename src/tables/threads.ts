@@ -28,7 +28,7 @@ export default class ThreadsTable extends Table {
       [userID],
     );
 
-    const threadIDs: string[] = res.rows;
+    const threadIDs: string[] = res.rows.map((th) => th.toString());
     if (catID === null) {
       res = await this.pool.query(
         `SELECT * FROM modmail.threads WHERE id = ANY ($1) ORDER BY id`,
@@ -43,7 +43,7 @@ export default class ThreadsTable extends Table {
         [threadIDs, catID],
       );
     }
-    
+
     return res.rows.map((thread) => ThreadsTable.parse(thread));
   }
 
