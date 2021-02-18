@@ -8,9 +8,12 @@ export default class Table {
 
   protected readonly name: string;
 
+  protected readonly full: string;
+
   constructor(pool: PoolClient, name: string) {
     this.pool = pool;
-    this.name = `modmail.${name}`;
+    this.name = name;
+    this.full = `modmail.${this.name}`;
   }
 
   /**
