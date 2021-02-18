@@ -31,12 +31,15 @@ export default class ThreadsTable extends Table {
     const threadIDs = res.rows.map((th) => th.thread_id);;
     if (catID === null) {
       res = await this.pool.query(
-        `SELECT * FROM modmail.threads WHERE id = ANY ($1) ORDER BY id`,
+        `SELECT * FROM modmail.threads WHERE id = ANY ($1) ORDER BY id DESC`,
         [threadIDs],
       );
     } else {
       res = await this.pool.query(
-        `SELECT * FROM modmail.threads WHERE id = ANY ($1) AND category = $2 ORDER BY id;`,
+        `SELECT * FROM modmail.threads
+           WHERE id = ANY ($1)
+           AND category = $2
+           ORDER BY id DESC;`,
         [threadIDs, catID],
       );
     }
