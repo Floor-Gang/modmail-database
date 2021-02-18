@@ -26,8 +26,9 @@ export default class Table {
       'SELECT COUNT(*) FROM information_schema.tables WHERE table_schema = $1 AND table_name = $2',
       ['modmail', this.name],
     );
+    const count = Number(res.rows[0].count);
 
-    if (res.rows[0].count === 0) {
+    if (count === 0) {
       await this.init();
     } else {
       await this.migrate();
@@ -45,6 +46,6 @@ export default class Table {
    * @returns {Promise<void>}
    */
   protected async init(): Promise<void> {
-    throw new Error(`Table init for ${this.name} has not been implemented.`);
+    throw new Error(`Table init for ${this.full} has not been implemented.`);
   }
 }
