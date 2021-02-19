@@ -113,6 +113,17 @@ export default class CategoriesTable extends Table {
     return res.rowCount !== 0;
   }
 
+  public async setPrivate(id: string, isPrivate: boolean): Promise<boolean> {
+    const res = await this.pool.query(
+      `UPDATE modmail.categories
+       SET is_private = $1
+       WHERE id = $2`,
+      [isPrivate, id],
+    );
+
+    return res.rowCount !== 0;
+  }
+
   /**
    * @method fetchAll
    * @param {boolean} activeOnly
