@@ -27,10 +27,14 @@ export default class CategoriesTable extends Table {
       channelID,
     } = opt;
     const desc = opt.description || '';
+    const isPrivate = opt.isPrivate !== undefined
+      ? opt.isPrivate
+      : false;
     await this.pool.query(
-      `INSERT INTO modmail.categories (id, name, description, guild_id, emoji, channel_id)
-       VALUES ($1, $2, $3, $4, $5, $6)`,
-      [categoryID, name, desc, guildID, emoji, channelID],
+      `INSERT INTO modmail.categories (id, name, description, guild_id, emoji,
+                                       channel_id, is_private)
+       VALUES ($1, $2, $3, $4, $5, $6, $7)`,
+      [categoryID, name, desc, guildID, emoji, channelID, isPrivate],
     );
 
     return {
@@ -40,6 +44,7 @@ export default class CategoriesTable extends Table {
       guildID,
       id: categoryID,
       isActive: true,
+      isPrivate,
       name,
     };
   }
@@ -205,14 +210,15 @@ export default class CategoriesTable extends Table {
     await this.pool.query(
       `CREATE TABLE IF NOT EXISTS modmail.categories
        (
-           id          BIGINT               NOT NULL
+           id          BIGINT                NOT NULL
                CONSTRAINT categories_pk PRIMARY KEY,
            channel_id  BIGINT UNIQUE,
-           name        TEXT UNIQUE          NOT NULL,
-           is_active   BOOLEAN DEFAULT true NOT NULL,
-           guild_id    BIGINT UNIQUE        NOT NULL,
-           emoji       TEXT UNIQUE          NOT NULL,
-           description TEXT    DEFAULT ''   NOT NULL
+           name        TEXT UNIQUE           NOT NULL,
+           is_active   BOOLEAN DEFAULT true  NOT NULL,
+           is_private  BOOLEAN DEFAULT false NOT NULL,
+           guild_id    BIGINT UNIQUE         NOT NULL,
+           emoji       TEXT UNIQUE           NOT NULL,
+           description TEXT    DEFAULT ''    NOT NULL
        );`,
     );
   }
@@ -259,9 +265,15 @@ export default class CategoriesTable extends Table {
       // noinspection SqlResolve
       await this.pool.query(
         `ALTER TABLE modmail.categories
-          RENAME COLUMN emote TO emoji;`
+            RENAME COLUMN emote TO emoji;`
       );
     }
+
+    // add private categories
+    await this.pool.query(
+      `ALTER TABLE modmail.categories
+          ADD COLUMN IF NOT EXISTS is_private BOOL DEFAULT false NOT NULL;`,
+    );
   }
 
   /**
@@ -271,6 +283,7 @@ export default class CategoriesTable extends Table {
    */
   private static parse(data: DBCategory): Category {
     return {
+      isPrivate: data.is_private,
       channelID: data.channel_id ? data.channel_id.toString() : null,
       emojiID: data.emoji,
       description: data.description,

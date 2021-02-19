@@ -2,18 +2,14 @@
 import { FileType } from '@Floor-Gang/modmail-types';
 
 /**
- * CreateCategoryOpt is used by ICategoryManager.create()
+ * CreateCategoryOpt is used by CategoryTable.create()
  * @type CreateCategoryOpt
- * @property {string} name New category name
- * @property {string?} description Optional description
- * @property {string} guildID Category guild
- * @property {string} emoji A unique emote assigned to the category
- * @property {string} channelID Channel category ID to utilize
  */
 export type CreateCategoryOpt = {
     name: string,
     description?: string,
     guildID: string,
+    isPrivate?: boolean,
     emoji: string,
     channelID: string,
 }
@@ -46,6 +42,7 @@ export type DBAttachment = {
 
 export type DBCategory = {
     is_active: boolean,
+    is_private: boolean,
     channel_id: number | null,
     emoji: string,
     description: string,
